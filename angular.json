@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "right-time": {
+    "right-weather": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/right-time",
+            "outputPath": "dist/right-weather",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -69,10 +69,13 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "right-time:build:production"
+              "browserTarget": "right-weather:build:production"
             },
             "development": {
-              "browserTarget": "right-time:build:development"
+              "browserTarget": "right-weather:build:development",
+              "port": 5002,
+              "hmr": true,
+              "liveReload": true
             }
           },
           "defaultConfiguration": "development"
@@ -80,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "right-time:build"
+            "browserTarget": "right-weather:build"
           }
         },
         "test": {
