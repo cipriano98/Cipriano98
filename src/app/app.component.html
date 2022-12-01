@@ -10,7 +10,7 @@
 </div>
 
 <div class="p-1" style="width: 300px;" *ngFor="let weather of weathers; index as i">
-  <div class="card">
+  <div class="card" [style]="getCardStyle(weather)">
     <div class="d-flex align-items-center justify-content-between">
       <div class="d-flex flex-column align-items-center justify-content-center w-100">
         <div>
@@ -25,7 +25,6 @@
     </div>
   </div>
 </div>
-
 <!-- 
 <div>
   <pre *ngFor="let weather of weathers"
