@@ -1,33 +1,24 @@
-<div>
-  <label for="newCity">Add new city</label>
-  <input
-    id="newCity"
-    [(ngModel)]="newCity"
-    type="text"
-    (keyup.enter)="addNewCity()"
-  />
-  <button (click)="addNewCity()">+</button>
+<div class="input">
+  <label for="newCity"></label>
+  <input placeholder="Adicionar Cidade" id="newCity" [(ngModel)]="newCity" type="text" (keyup.enter)="addNewCity()" />
 </div>
 
-<div class="p-1" style="width: 300px;" *ngFor="let weather of weathers; index as i">
-  <div class="card" [style]="getCardStyle(weather)">
-    <div class="d-flex align-items-center justify-content-between">
+<div class="container" *ngFor="let weather of weathers; index as i">
+  <div class="card d-flex flex-row">
+    <div class="card-header d-flex align-items-center justify-content-between"
+      [style]="'background-image:'+getWeatherImage()">
       <div class="d-flex flex-column align-items-center justify-content-center w-100">
         <div>
-            <span class="fw-bold p-2">{{ weather.name }}</span>
+          <span class="fw-bold p-2">{{ weather.name }}</span>
         </div>
 
         <div>
-            <span>{{ weather.main.temp | number: "1.0-0" }} °C</span>
+          <span>{{ weather.main.temp | number: "1.0-0" }} °C</span>
         </div>
       </div>
-      <span class="btn" (click)="removeCity(i, weather.name)">x</span>
     </div>
+    <div class="card-body" *ngIf=""></div>
+    <div class="card-body"></div>
+    <span class="btn" (click)="removeCity(i, weather.name)">x</span>
   </div>
 </div>
-<!-- 
-<div>
-  <pre *ngFor="let weather of weathers"
-    >{{ weather.name }}: {{ weather | json }}</pre
-  >
-</div> -->

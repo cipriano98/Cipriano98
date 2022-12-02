@@ -11,10 +11,11 @@ import { WeatherService } from './service/weather.service';
 export class AppComponent implements OnInit {
   constructor(private readonly service: WeatherService) { }
 
+
+
   public newCity: string = '';
   public weathers: any[] = [];
   public cities: string[] = [];
-
   ngOnInit(): void {
     this.getCities();
   }
@@ -68,6 +69,9 @@ export class AppComponent implements OnInit {
   private addLocalStorage(): void {
     localStorage.setItem('cities', this.cities.toString());
   }
+  public getWeatherImage(): string {
+    return "url('assets/img/afternoon.jpeg')"
+  }
 
   public removeCity(index: number, cityName: string): void {
     this.cities = this.cities.filter((city): boolean => {
@@ -93,30 +97,8 @@ export class AppComponent implements OnInit {
 
     city && this.getWeather(this.removeAccents(city));
   }
-  public getCardStyle(weather: any): string {
-    let color: string = 'trasparent'
-    const temp: number = weather.main.temp
-    if (temp < 0) {
-      color = 'blue'
-    }
-    else if (temp < 10) {
-      color = 'aqua'
-    }
-    else if (temp < 23) {
-      color = 'brown'
-    }
-    else if (temp < 27){
-      color = 'yellow'
-    }
-    else if (temp > 27) {
-      color = 'orange'
-    }
-
-    return `background: ${color}`
-  }
 
   // TODO utils
-
   /**
    * @author Natan Cipriano <natancipriano98@gmail.com>
    * @description
