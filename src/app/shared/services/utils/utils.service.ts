@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core'
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class UtilsService {
   /**
@@ -20,40 +20,40 @@ export class UtilsService {
        * @description
        * Atributo a qual deseja realizar ordenação
        */
-      atribute?: string[];
+      atribute?: string[]
       /**
        * @description
        * Define a ordenação se é `ASC` ou `DESC`
        * @default 'ASC'
        */
-      order?: 'ASC' | 'DESC';
+      order?: 'ASC' | 'DESC'
     } = {}
   ): ObjectArray[] {
-    options.order ??= 'ASC';
+    options.order ??= 'ASC'
 
     return objectArray.sort((a: ObjectArray, b: ObjectArray): 1 | 0 | -1 => {
       const getAtribute = (currentSort: string): string => {
-        let atributeFormated: string = '';
+        let atributeFormated: string = ''
         options.atribute?.forEach((string): void => {
-          atributeFormated += `.${string}`;
-        });
+          atributeFormated += `.${string}`
+        })
 
         const response = isNaN(eval(`${currentSort}${atributeFormated}`))
           ? `${currentSort}${atributeFormated}.toLowerCase()`
-          : `${currentSort}${atributeFormated}`;
+          : `${currentSort}${atributeFormated}`
 
-        return response;
-      };
+        return response
+      }
 
       if (eval(getAtribute('a')) > eval(getAtribute('b'))) {
-        return options.order === 'ASC' ? 1 : -1;
+        return options.order === 'ASC' ? 1 : -1
       }
       if (eval(getAtribute('a')) < eval(getAtribute('b'))) {
-        return options.order === 'ASC' ? -1 : 1;
+        return options.order === 'ASC' ? -1 : 1
       }
 
-      return 0;
-    });
+      return 0
+    })
   }
 
   public removeAccents(text: string): string {
@@ -65,8 +65,8 @@ export class UtilsService {
       .replace(new RegExp(/[\xF2-\xF6]/g), 'o')
       .replace(new RegExp(/[\xF9-\xFC]/g), 'u')
       .replace(new RegExp(/\xE7/g), 'c')
-      .replace(new RegExp(/\xF1/g), 'n');
+      .replace(new RegExp(/\xF1/g), 'n')
 
-    return text;
+    return text
   }
 }
