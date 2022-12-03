@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { WeatherSchema } from '../model/weather.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -8,11 +10,12 @@ import { Observable } from 'rxjs';
 export class WeatherService {
   constructor(private readonly httpClient: HttpClient) {}
 
-  public LoadRightWeather(city: string): Observable<any> {
-    const url: string = 'https://api.openweathermap.org/data/2.5/weather';
-    const APPID: string = '047bcea09682273b2c0d065d4566861a';
-    const queryParam: string = `q=${city}&&APPID=${APPID}&units=metric`;
+  private readonly api: string = environment.api;
+  private readonly appid: string = environment.appid;
 
-    return this.httpClient.get(`${url}?${queryParam}`);
+  public LoadRightWeather(city: string): Observable<WeatherSchema> {
+    const queryParam: string = `q=${city}&APPID=${this.appid}&units=metric`;
+
+    return this.httpClient.get<WeatherSchema>(`${this.api}?${queryParam}`);
   }
 }

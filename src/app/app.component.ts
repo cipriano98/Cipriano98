@@ -1,7 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { debounceTime, finalize, repeat } from 'rxjs';
+import { finalize } from 'rxjs';
+import { WeatherSchema } from './model/weather.model';
 import { WeatherService } from './service/weather.service';
+import { UtilsService } from './shared/services/utils/utils.service';
 
 @Component({
   selector: 'app-root',
@@ -9,11 +11,16 @@ import { WeatherService } from './service/weather.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  constructor(private readonly service: WeatherService) {}
+  constructor(
+    private readonly service: WeatherService,
+    private readonly utils: UtilsService
+  ) {}
 
   public newCity: string = '';
-  public weathers: any[] = [];
-  public cities: string[] = [];
+  public weathers: WeatherSchema[] = [];
+  public loading: boolean = false;
+
+  private cities: string[] = [];
 
   ngOnInit(): void {
     this.getCities();
@@ -30,7 +37,7 @@ export class AppComponent implements OnInit {
     }
 
     this.cities = cities.split(',').map((city): string => {
-      return this.removeAccents(city.trim());
+      return this.utils.removeAccents(city.trim());
     });
 
     this.cities.forEach((city): void => {
@@ -39,12 +46,15 @@ export class AppComponent implements OnInit {
   }
 
   private getWeather(city: string): void {
+    this.loading = true;
     this.service
       .LoadRightWeather(city)
       .pipe(
         finalize((): void => {
           this.newCity = '';
-          this.weathers = this.sort(this.weathers, {
+          this.loading = false;
+
+          this.weathers = this.utils.sort(this.weathers, {
             atribute: ['name'],
             order: 'DESC',
           });
@@ -71,7 +81,7 @@ export class AppComponent implements OnInit {
 
   public removeCity(index: number, cityName: string): void {
     this.cities = this.cities.filter((city): boolean => {
-      return city != this.removeAccents(cityName.toLowerCase());
+      return city != this.utils.removeAccents(cityName.toLowerCase());
     });
 
     this.addLocalStorage();
@@ -91,73 +101,6 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    city && this.getWeather(this.removeAccents(city));
-  }
-
-  // TODO utils
-
-  /**
-   * @author Natan Cipriano <natancipriano98@gmail.com>
-   * @description
-   * Ordena o array
-   * @todo Mostrar o atributo desejado para realizar a ordenação
-   * @param objectArray Array a qual deseja realizar a ordenação
-   * @param options Define as configurações para a ordenação
-   * @returns O Array ordenado
-   */
-  public sort<ObjectArray>(
-    objectArray: ObjectArray[],
-    options: {
-      /**
-       * @description
-       * Atributo a qual deseja realizar ordenação
-       */
-      atribute?: string[];
-      /**
-       * @description
-       * Define a ordenação se é `ASC` ou `DESC`
-       * @default 'ASC'
-       */
-      order?: 'ASC' | 'DESC';
-    } = {}
-  ): ObjectArray[] {
-    options.order ??= 'ASC';
-
-    return objectArray.sort((a: ObjectArray, b: ObjectArray): 1 | 0 | -1 => {
-      const getAtribute = (currentSort: string): string => {
-        let atributeFormated: string = '';
-        options.atribute?.forEach((string): void => {
-          atributeFormated += `.${string}`;
-        });
-
-        const response = isNaN(eval(`${currentSort}${atributeFormated}`))
-          ? `${currentSort}${atributeFormated}.toLowerCase()`
-          : `${currentSort}${atributeFormated}`;
-
-        return response;
-      };
-
-      if (eval(getAtribute('a')) > eval(getAtribute('b'))) {
-        return options.order === 'ASC' ? 1 : -1;
-      }
-      if (eval(getAtribute('a')) < eval(getAtribute('b'))) {
-        return options.order === 'ASC' ? -1 : 1;
-      }
-
-      return 0;
-    });
-  }
-
-  private removeAccents(text: string): string {
-    text = text
-      ?.toLowerCase()
-      .replace(new RegExp(/[\xE0-\xE6]/g), 'a')
-      .replace(new RegExp(/[\xE8-\xEB]/g), 'e')
-      .replace(new RegExp(/[\xEC-\xEF]/g), 'i')
-      .replace(new RegExp(/[\xF2-\xF6]/g), 'o')
-      .replace(new RegExp(/[\xF9-\xFC]/g), 'u')
-      .replace(new RegExp(/\xE7/g), 'c')
-      .replace(new RegExp(/\xF1/g), 'n');
-    return text;
+    city && this.getWeather(this.utils.removeAccents(city));
   }
 }
