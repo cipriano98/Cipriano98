@@ -20,28 +20,29 @@ export class AppComponent implements OnInit {
   public weathers: WeatherSchema[] = []
   public loading: boolean = false
 
-  private cities: string[] = []
-
   ngOnInit(): void {
     this.getCities()
   }
 
   private getCities(): void {
-    let cities: string | null = localStorage.getItem('cities')
+    const defaultWeathers: Partial<WeatherSchema>[] = [
+      { name: 'Porto Alegre' },
+      { name: 'Papai' },
+      { name: 'Noel' },
+      { name: 'Curitiba' },
+      { name: 'Pará' }
+    ]
 
-    if (!cities) {
-      this.cities = ['porto alegre', 'papai', 'noel', 'curitiba', 'para']
-      this.addLocalStorage()
+    const storage = JSON.parse(
+      localStorage.getItem('weathers') ?? '{}'
+    ) as WeatherSchema[]
 
-      cities = localStorage.getItem('cities') ?? ''
-    }
+    const weathers = storage.length ? storage : defaultWeathers
 
-    this.cities = cities.split(',').map((city): string => {
-      return this.utils.removeAccents(city.trim())
-    })
-
-    this.cities.forEach((city): void => {
-      this.getWeather(city)
+    this.updateStorage()
+    weathers.forEach(weather => {
+      this.newCity = weather.name ?? ''
+      this.addNewCity()
     })
   }
 
@@ -61,12 +62,13 @@ export class AppComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (weather): void => {
-          const includesCity: boolean = this.cities.includes(city)
-          !includesCity && this.cities.push(city.toLowerCase())
+        next: (weatherResponse): void => {
+          const includesCity: boolean = this.includesCity(weatherResponse.name)
 
-          this.weathers.push(weather)
-          this.addLocalStorage()
+          if (!includesCity) {
+            this.weathers.push(weatherResponse)
+            this.updateStorage()
+          }
         },
         error: (err: HttpErrorResponse): void => {
           const message = err.error.message
@@ -75,32 +77,37 @@ export class AppComponent implements OnInit {
       })
   }
 
-  private addLocalStorage(): void {
-    localStorage.setItem('cities', this.cities.toString())
+  private updateStorage(): void {
+    const weathers: Partial<WeatherSchema>[] = this.weathers.map(weather => {
+      return {
+        name: weather.name
+      }
+    })
+
+    localStorage.setItem('weathers', JSON.stringify(weathers))
+  }
+
+  private includesCity(city: string): boolean {
+    const includesCity: boolean = !!this.weathers.find(weather => {
+      return weather.name.toLowerCase() === city.toLowerCase()
+    })
+
+    includesCity && alert(`This city is already listed`)
+
+    return includesCity
   }
 
   public removeCity(index: number, cityName: string): void {
-    this.cities = this.cities.filter((city): boolean => {
-      return city != this.utils.removeAccents(cityName.toLowerCase())
-    })
-
-    this.addLocalStorage()
-
     this.weathers.splice(index, 1)
+    this.updateStorage()
   }
 
   public addNewCity(): void {
     const city: string = this.newCity.trim().toLowerCase()
 
-    const includesCity: boolean = this.cities.includes(city)
+    const includesCity: boolean = this.includesCity(city)
+    !includesCity && city && this.getWeather(city)
 
-    if (includesCity) {
-      alert(`This city is already listed`)
-
-      this.newCity = ''
-      return
-    }
-
-    city && this.getWeather(this.utils.removeAccents(city))
+    this.newCity = ''
   }
 }
